@@ -9,13 +9,13 @@ import os
 from datasets.load import load_from_disk
 from transformers import AutoTokenizer
 from evaluate import load
-from datasets import load_dataset, load_metric
+from datasets import load_dataset
 from transformers import AutoModelForSequenceClassification
 from transformers import TrainingArguments, Trainer
 import numpy as np
 
 MODEL_PATH = "cardiffnlp/twitter-roberta-base-sentiment-latest"
-# CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/summary/checkpoint-203000"
+CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/review_rating/output/checkpoint-50000"
 OUTPUT_DIR = "/workspaces/mlops-template-Shunian-Chen/review_rating/output"
 DATA_PATH = "/workspaces/mlops-template-Shunian-Chen/tokenized_datasets"
 REPO_DIR = "yelp_review_rating"
@@ -36,7 +36,7 @@ else:
 
 
 # Load the model
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, num_labels=5, ignore_mismatched_sizes=True)
+model = AutoModelForSequenceClassification.from_pretrained(CHECK_POINT_PATH, num_labels=5, ignore_mismatched_sizes=True)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
 model.push_to_hub(REPO_DIR)
@@ -75,5 +75,5 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
 )
 
-trainer.train() # train the model resume_from_checkpoint=CHECK_POINT_PATH
+trainer.train(resume_from_checkpoint=CHECK_POINT_PATH) # train the model resume_from_checkpoint=CHECK_POINT_PATH
 trainer.push_to_hub(REPO_DIR) 

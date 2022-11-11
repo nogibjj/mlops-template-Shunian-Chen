@@ -9,16 +9,17 @@ import os
 from datasets.load import load_from_disk
 from transformers import AutoTokenizer
 from evaluate import load
-from datasets import load_dataset, load_metric
+from datasets import load_dataset
 from transformers import AutoModelForSequenceClassification
 from transformers import TrainingArguments, Trainer
 import numpy as np
 
 MODEL_PATH = "cardiffnlp/twitter-roberta-base-sentiment-latest"
-# CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/summary/checkpoint-203000"
-OUTPUT_DIR = "/workspaces/mlops-template-Shunian-Chen/review_rating/output"
+TOKENIZER_PATH = "bert-base-cased"
+CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/review_rating_reberta_base/output/checkpoint-167000"
+OUTPUT_DIR = "/workspaces/mlops-template-Shunian-Chen/review_rating_reberta_base/output"
 DATA_PATH = "/workspaces/mlops-template-Shunian-Chen/tokenized_datasets"
-REPO_DIR = "yelp_review_rating"
+REPO_DIR = "yelp_review_rating_reberta_base"
 
 
 def tokenize_function(examples):
@@ -28,7 +29,7 @@ def tokenize_function(examples):
 # Load the dataset
 if not (os.path.exists(DATA_PATH)):
     dataset = load_dataset("yelp_review_full")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+    tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH)
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
     tokenized_datasets.save_to_disk(DATA_PATH)
 else:
@@ -36,11 +37,8 @@ else:
 
 
 # Load the model
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, num_labels=5, ignore_mismatched_sizes=True)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-
-model.push_to_hub(REPO_DIR)
-tokenizer.push_to_hub(REPO_DIR)
+model = AutoModelForSequenceClassification.from_pretrained(CHECK_POINT_PATH)
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH)
 
 metric = load("accuracy")
 def compute_metrics(eval_pred):
@@ -75,5 +73,7 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
 )
 
-trainer.train() # train the model resume_from_checkpoint=CHECK_POINT_PATH
+trainer.train(resume_from_checkpoint=CHECK_POINT_PATH) # train the model resume_from_checkpoint=CHECK_POINT_PATH
 trainer.push_to_hub(REPO_DIR) 
+model.push_to_hub(REPO_DIR)
+tokenizer.push_to_hub(REPO_DIR)

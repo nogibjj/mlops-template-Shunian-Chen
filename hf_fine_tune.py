@@ -16,7 +16,7 @@ import numpy as np
 
 MODEL_PATH = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 TOKENIZER_PATH = "bert-base-cased"
-CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/review_rating_reberta_base/output/checkpoint-167000"
+CHECK_POINT_PATH = "/workspaces/mlops-template-Shunian-Chen/review_rating_reberta_base/output/checkpoint-203000"
 OUTPUT_DIR = "/workspaces/mlops-template-Shunian-Chen/review_rating_reberta_base/output"
 DATA_PATH = "/workspaces/mlops-template-Shunian-Chen/tokenized_datasets"
 REPO_DIR = "yelp_review_rating_reberta_base"
